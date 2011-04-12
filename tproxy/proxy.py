@@ -97,18 +97,6 @@ class ProxyServer(StreamServer):
         else:
             self.route = self.script
 
-        
-        if hasattr(self.route, "rewrite_request"):
-            self.rewrite_request = self.route.rewrite_request
-        else:
-            self.rewrite_request = None
-
-
-        if hasattr(self.route, "rewrite_response"):
-            self.rewrite_response = self.route.rewrite_response
-        else:
-            self.rewrite_response = None
-
         self.refresh_name() 
         super(ProxyServer, self).start_accepting()
 

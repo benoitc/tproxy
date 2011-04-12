@@ -3,14 +3,14 @@
 # This file is part of tproxy released under the MIT license. 
 # See the NOTICE for more information.
 
-
 import logging
 
-import greenlet
+import gevent
 from gevent import coros
 from gevent import socket
+import greenlet
 
-from .server import ServerConnection
+from .server import ServerConnection, InactivityTimeout
 from .util import parse_address, is_ipv6
 
 log = logging.getLogger(__name__)
@@ -18,10 +18,6 @@ log = logging.getLogger(__name__)
 class ConnectionError(Exception):
     """ Exception raised when a connection is either rejected or a
     connection timeout occurs """
-
-class InactivityTimeout(Exception):
-    """ Exception raised when the configured timeout elapses without
-    receiving any data from a connected server """
 
 class ClientConnection(object):
 
@@ -126,17 +122,18 @@ class ClientConnection(object):
     def connect_to_resource(self, addr, connect_timeout=None,
             inactivity_timeout=None):
 
-        try:
-            if is_ipv6(addr[0]):
-                sock = socket.socket(socket.AF_INET6, 
-                        socket.SOCK_STREAM)
-            else:
-                sock = socket.socket(socket.AF_INET, 
-                        socket.SOCK_STREAM)
-            sock.connect(addr)
-        except socket.error, e:
-            raise ConnectionError(
-                    "socket error while connectinng: [%s]" % str(e))
+        with gevent.Timeout(connect_timeout, ConnectionError):
+            try:
+                if is_ipv6(addr[0]):
+                    sock = socket.socket(socket.AF_INET6, 
+                            socket.SOCK_STREAM)
+                else:
+                    sock = socket.socket(socket.AF_INET, 
+                            socket.SOCK_STREAM)
+                sock.connect(addr)
+            except socket.error, e:
+                raise ConnectionError(
+                        "socket error while connectinng: [%s]" % str(e))
 
         self.remote = addr
         self.connected = True
