@@ -26,7 +26,6 @@ class ServerConnection(object):
             ]
         gevent.joinall(jobs)
 
-
     def proxy_input(self, src, dest):
         while True:
             data = src.recv(8192)
@@ -34,8 +33,6 @@ class ServerConnection(object):
                 break
             self.log.debug("got data from input")
             dest.sendall(data)
-
-
 
     def proxy_connected(self, src, dest):
         while True:
