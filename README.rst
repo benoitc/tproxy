@@ -4,7 +4,7 @@ tproxy
 tproxy is a simple TCP routing proxy (layer 7)  built on
 Gevent_ that lets you configure the routine logic in Python. It's heavily
 inspired from `proxy machine <https://github.com/mojombo/proxymachine>`_
-but have some unique like the pre-fork worker model borrowed to
+but have some unique features like the pre-fork worker model borrowed to
 Gunicorn_.
 
 
