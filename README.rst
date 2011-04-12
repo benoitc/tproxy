@@ -150,6 +150,18 @@ Valid return values
 * { "close": String } - Close the connection after sending
   the String.
 
+Handle errors
+-------------
+
+You can easily handling error by adding a **proxy_error** function in
+your script::
+
+    def proxy_error(client, e):
+        pass
+
+This function get the ClientConnection instance (current connection) as
+first arguments and the error exception in second argument.
+
 Copyright
 ---------
 2011 (c) Benoît Chesneau <benoitc@e-engura.org>
