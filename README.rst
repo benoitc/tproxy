@@ -61,7 +61,6 @@ Usage
 
 Signals
 -------
-nam
 ::
 
     QUIT    -   Graceful shutdown. Stop accepting connections immediatly
