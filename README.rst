@@ -18,6 +18,7 @@ tproxy requires **Python 2.x >= 2.5**. Python 3.x support is planned.
     $ pip install tproxy
 
 To install from source::
+
     $ git clone git://github.com/benoitc/tproxy.git
     $ cd tproxy
     $ pip install -r requirements.txt
@@ -25,6 +26,8 @@ To install from source::
 
 Usage
 -----
+
+::
 
     $ tproxy -h
 
