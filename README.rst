@@ -43,33 +43,27 @@ Usage
     Usage: tproxy [OPTIONS] script_path
 
     Options:
-      --version             show program's version number and exit
-      -h, --help            show this help message and exit
-      --log-file=FILE       The log file to write to. [-]
-      --log-level=LEVEL     The granularity of log outputs. [info]
-      --log-config=FILE     The log config file to use. [None]
-      -n STRING, --name=STRING
-                            A base to use with setproctitle for process naming.
-                            [None]
-      -D, --daemon          Daemonize the Gunicorn process. [False]
-      -p FILE, --pid=FILE   A filename to use for the PID file. [None]
-      -u USER, --user=USER  Switch worker processes to run as this user. [501]
+      --version                     show program's version number and exit
+      -h, --help                    show this help message and exit
+      --log-file=FILE               The log file to write to. [-]
+      --log-level=LEVEL             The granularity of log outputs. [info]
+      --log-config=FILE             The log config file to use. [None]
+      -n STRING, --name=STRING      A base to use with setproctitle for process naming.
+                                    [None]
+      -D, --daemon                  Daemonize the Gunicorn process. [False]
+      -p FILE, --pid=FILE           A filename to use for the PID file. [None]
+      -u USER, --user=USER          Switch worker processes to run as this user. [501]
       -g GROUP, --group=GROUP
-                            Switch worker process to run as this group. [20]
-      -m INT, --umask=INT   A bit mask for the file mode on files written by
-                            Gunicorn. [0]
-      -b ADDRESS, --bind=ADDRESS
-                            The socket to bind. [127.0.0.1:8000]
-      --backlog=INT         The maximum number of pending connections.     [2048]
-      -w INT, --workers=INT
-                            The number of worker process for handling requests.
-                            [1]
-      --worker-connections=INT
-                            The maximum number of simultaneous clients per worker.
-                            [1000]
-      -t INT, --timeout=INT
-                            Workers silent for more than this many seconds are
-                            killed and restarted. [30]
+                                    Switch worker process to run as this group. [20]
+      -m INT, --umask=INT           A bit mask for the file mode on files written by
+                                    Gunicorn. [0]
+      -b ADDRESS, --bind=ADDRESS    The socket to bind. [127.0.0.1:8000]
+      --backlog=INT                 The maximum number of pending connections.     [2048]
+      -w INT, --workers=INT         The number of worker process for handling requests. [1]
+      --worker-connections=INT      The maximum number of simultaneous clients per worker.
+                                    [1000]
+      -t INT, --timeout=INT         Workers silent for more than this many seconds are
+                                    killed and restarted. [30]
 
 Signals
 -------
