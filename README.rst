@@ -25,6 +25,14 @@ To install from source::
     $ pip install -r requirements.txt
     $ python setup.py install
 
+
+Test your installation by running the command line::
+
+    $ tproxy examples/transparent.py
+
+And go on http://127.0.0.1:5000 , you should see the google homepage.
+
+
 Usage
 -----
 
