@@ -14,6 +14,7 @@ Instalation
 tproxy requires **Python 2.x >= 2.5**. Python 3.x support is planned.
 
 ::
+
     $ pip install gevent
     $ pip install tproxy
 
@@ -85,7 +86,9 @@ Signals
 
 Exemple of routing script
 -------------------------
+
 ::
+
     import re
     re_host = re.compile("Host:\s*(.*)\r\n")
 
@@ -111,7 +114,9 @@ Exemple of routing script
 
 Example SOCKS4 Proxy in 18 Lines
 --------------------------------
+
 ::
+
     import socket
     import struct
 
