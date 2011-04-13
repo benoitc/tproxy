@@ -13,9 +13,6 @@ from . import util
 from .proxy import ProxyServer
 from .workertmp import WorkerTmp
 
-
-
-
 class Worker(ProxyServer):
 
     def __init__(self, age, ppid, listener, cfg, script):
