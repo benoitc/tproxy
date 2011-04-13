@@ -51,6 +51,9 @@ class ClientConnection(object):
         except ConnectionError, e:
             log.error("Error while connecting: [%s]" % str(e))
             self.handle_error(e)
+        except InactivityTimeout, e:
+            log.warn("inactivity timeout")
+            self.handle_error(e)
         except socket.error, e:
             log.error("socket.error: [%s]" % str(e))
             self.handle_error(e)
@@ -138,11 +141,13 @@ class ClientConnection(object):
         self.remote = addr
         self.connected = True
         log.debug("Successful connection to %s:%s" % addr)
-        if self.buf:
+
+        if self.buf and not self.server.rewrite_request:
             self.send_data(sock, self.buf)
+            self.buf = []
 
         server = ServerConnection(sock, self, 
-                timeout=inactivity_timeout)
+                timeout=inactivity_timeout, buf=self.buf)
         server.handle()
 
 def _closesocket(sock):

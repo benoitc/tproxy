@@ -36,6 +36,8 @@ class ProxyServer(StreamServer):
         self.script = script
         self.nb_connections = 0
         self.route = None
+        self.rewrite_request = None
+        self.rewrite_response = None
 
     def handle_quit(self, *args):
         """Graceful shutdown. Stop accepting connections immediately and
@@ -96,6 +98,17 @@ class ProxyServer(StreamServer):
             self.route = self.script.load()
         else:
             self.route = self.script
+       
+        try: 
+            self.rewrite_request = self.route.rewrite_request
+        except AttributeError:
+            pass 
+       
+        try:
+            self.rewrite_response =  self.route.rewrite_response
+        except AttributeError:
+            pass 
+
 
         self.refresh_name() 
         super(ProxyServer, self).start_accepting()
