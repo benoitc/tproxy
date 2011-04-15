@@ -3,7 +3,6 @@
 # This file is part of tproxy released under the MIT license. 
 # See the NOTICE for more information.
 
-import errno
 import imp
 import logging
 from logging.config import fileConfig

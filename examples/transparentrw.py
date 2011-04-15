@@ -1,18 +1,19 @@
+import io
 import re
 
 def rewrite_request(req):
     while True:
-        data = req.recv()
+        data = req.read(io.DEFAULT_BUFFER_SIZE)
         if not data:
             break
-        req.send(data)         
+        req.write(data) 
 
 def rewrite_response(resp):
     while True:
-        data = resp.recv()
+        data = resp.read(io.DEFAULT_BUFFER_SIZE)
         if not data:
             break
-        resp.send(data)
+        resp.write(data)
 
 def proxy(data):
     return {'remote': ('google.com', 80)}

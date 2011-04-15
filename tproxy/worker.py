@@ -5,6 +5,7 @@
 
 import os
 import logging
+import signal
 
 import gevent
 from gevent.pool import Pool
@@ -14,6 +15,11 @@ from .proxy import ProxyServer
 from .workertmp import WorkerTmp
 
 class Worker(ProxyServer):
+
+    SIGNALS = map(
+        lambda x: getattr(signal, "SIG%s" % x),
+        "HUP QUIT INT TERM USR1 USR2 WINCH CHLD".split()
+    )
 
     def __init__(self, age, ppid, listener, cfg, script):
         ProxyServer.__init__(self, listener, script, 
@@ -47,6 +53,7 @@ class Worker(ProxyServer):
         util.close_on_exec(self.socket)
         util.close_on_exec(self.tmp.fileno())
 
+        map(lambda s: signal.signal(s, signal.SIG_DFL), self.SIGNALS)
         self.booted = True
 
     def start_heartbeat(self):
