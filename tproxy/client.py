@@ -62,7 +62,6 @@ class ClientConnection(object):
         except KeyboardInterrupt:
             pass
         except Exception, e:
-            print type(e)
             log.error("unknown error %s" % str(e))
         finally:
             if self.remote is not None:
