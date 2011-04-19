@@ -39,6 +39,7 @@ def rewrite_request(req):
                     break
                 req.send(data)
             if not parser.should_keep_alive():
+                print "don't keep alive"
                 break
     except socket.error:
         pass
@@ -47,8 +48,13 @@ def rewrite_request(req):
 def rewrite_response(resp):
     while True:
         parser = HttpStream(resp)
+        # we aren't doing anything here
         for data in parser:
-            resp.write(data)
+            resp.send(data)
+ 
+        if not parser.should_keep_alive():
+            # close the connection.
+            break
 
 def proxy(data):
     return {'remote': ('gunicorn.org', 80)}
