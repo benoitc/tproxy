@@ -4,24 +4,20 @@ from http_parser.reader import SocketReader
 import socket
 
 def rewrite_headers(parser, values=None):
-    try:
-        headers = parser.headers()
-        if isinstance(values, dict):
-            headers.update(values)
+    headers = parser.headers()
+    if isinstance(values, dict):
+        headers.update(values)
 
-        httpver = "HTTP/%s" % ".".join(map(str, 
-                    parser.version()))
+    httpver = "HTTP/%s" % ".".join(map(str, 
+                parser.version()))
 
-        new_headers = ["%s %s %s\r\n" % (parser.method(), parser.url(), 
-            httpver)]
+    new_headers = ["%s %s %s\r\n" % (parser.method(), parser.url(), 
+        httpver)]
 
-        new_headers.extend(["%s: %s\r\n" % (k, str(v)) for k, v in \
-                headers.items()])
+    new_headers.extend(["%s: %s\r\n" % (k, str(v)) for k, v in \
+            headers.items()])
 
-        return "".join(new_headers) + "\r\n"
-    except NoMoreData:
-        return
-
+    return "".join(new_headers) + "\r\n"
 
 def rewrite_request(req):
     try: 
@@ -41,20 +37,23 @@ def rewrite_request(req):
             if not parser.should_keep_alive():
                 print "don't keep alive"
                 break
-    except socket.error:
+    except (socket.error, NoMoreData):
         pass
 
 
 def rewrite_response(resp):
-    while True:
-        parser = HttpStream(resp)
-        # we aren't doing anything here
-        for data in parser:
-            resp.send(data)
- 
-        if not parser.should_keep_alive():
-            # close the connection.
-            break
+    try:
+        while True:
+            parser = HttpStream(resp)
+            # we aren't doing anything here
+            for data in parser:
+                resp.send(data)
+     
+            if not parser.should_keep_alive():
+                # close the connection.
+                break
+    except (socket.error, NoMoreData):
+        pass
 
 def proxy(data):
     return {'remote': ('gunicorn.org', 80)}
