@@ -66,28 +66,31 @@ class RewriteIO(io.RawIOBase):
         io.RawIOBase.__init__(self)
         self._src = src
         self._dest = dest
-        self._buf = buf or []
+
+        if not buf:
+            buf = []
+        self._buf = buf
         
     def readinto(self, b):
         self._checkClosed()
         self._checkReadable()
         
-        buf = "".join(self._buf)
+        buf = bytes("".join(self._buf))
 
-        if buf:
+        if buf and buf is not None:
             l = len(b)
             if len(self._buf) > l:
                 del b[l:]
 
-                b[0:l], buf = bytes(buf[:l]), buf[l:]
+                b[0:l], buf = buf[:l], buf[l:]
                 self._buf = [buf]
-                return l
+                return len(b)
             else:
                 length = len(buf)
                 del b[length:]
-                b[0:length] = bytes(buf)
+                b[0:length] = buf
                 self._buf = []
-                return length 
+                return len(b) 
 
         if _readinto is not None:
             return _readinto(self._src, b)

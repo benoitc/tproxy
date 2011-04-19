@@ -17,17 +17,15 @@ class InactivityTimeout(Exception):
     """ Exception raised when the configured timeout elapses without
     receiving any data from a connected server """
 
-class CodependentGroup(Group):
+class Peers(Group):
     """
-A greenlet group that will kill all greenlets if a single one dies.
-"""
+    Peered greenlets. If one of greenlet is killed, all are killed. 
+    """
     def discard(self, greenlet):
-        super(CodependentGroup, self).discard(greenlet)
+        super(Peers, self).discard(greenlet)
         if not hasattr(self, '_killing'):
             self._killing = True
             gevent.spawn(self.kill)
-
-
 
 class RewriteProxy(object):
 
@@ -38,7 +36,6 @@ class RewriteProxy(object):
         self.rewrite_fun = rewrite_fun
         self.timeout = timeout
         self.buf = buf 
- 
 
     def run(self):
         pipe = RewriteIO(self.src, self.dest, self.buf) 
@@ -63,17 +60,15 @@ class ServerConnection(object):
     def handle(self):
         """ start to relay the response
         """
-
-        pool = Pool([
-            gevent.spawn(self.proxy_input, self.client.sock, self.sock),
-            gevent.spawn(self.proxy_connected, self.sock,
-                self.client.sock)])
         try:
-            self._stopped_event.wait()
-        except:
-            pool.join(timeout=self.timeout)
-            pool.kill(block=True, timeout=1)
-            raise
+            peers = Peers([
+                gevent.spawn(self.proxy_input, self.client.sock, self.sock),
+                gevent.spawn(self.proxy_connected, self.sock, 
+                    self.client.sock)])
+            gevent.joinall(peers.greenlets)
+        finally:
+            self.sock.close
+
         
     def proxy_input(self, src, dest):
         """ proxy innput to the connected host
@@ -88,7 +83,6 @@ class ServerConnection(object):
                     break
                 self.log.debug("got data from input")
                 dest.sendall(data)
-        self._stopped_event.set()
 
     def proxy_connected(self, src, dest):
         """ proxy the response from the connected host to the client
@@ -103,7 +97,6 @@ class ServerConnection(object):
                     break
                 self.log.debug("got data from connected")
                 dest.sendall(data)
-        self._stopped_event.set()
 
     def rewrite(self, src, dest, fun, buf=None):
         rwproxy = RewriteProxy(src, dest, fun, timeout=self.timeout, 
