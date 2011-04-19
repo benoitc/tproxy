@@ -164,6 +164,22 @@ your script::
 This function get the ClientConnection instance (current connection) as
 first arguments and the error exception in second argument.
 
+Rewrite requests & responses
+----------------------------
+
+Main goal of tproxy is to allows you to route transparently tcp to your
+applications. But some case you want to do more. For example you need in
+HTTP 1.1 to change the Host header to make sure remote HTTP server will
+know what to do if uses virtual hosting.
+
+To do that, add a **rewrite_request** function in your function to
+simply rewrite clienrt request and **rewrite_response** to rewrite the
+remote response. Both functions take a tproxy.rewrite.RewriteIO instance
+which is based on io.RawIOBase class.
+
+See the `httprewrite.py <https://github.com/benoitc/tproxy/blob/master/examples/httprewrite.py>`_ example for an example of HTTP rewrite.
+
+
 Copyright
 ---------
 2011 (c) Benoît Chesneau <benoitc@e-engura.org>
