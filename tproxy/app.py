@@ -12,6 +12,7 @@ import sys
 from . import util
 from .arbiter import Arbiter
 from .config import Config
+from .tools import import_module
 
 class Script(object):
     """ load a python file or module """
@@ -23,9 +24,15 @@ class Script(object):
         if os.path.exists(self.script_uri):
             script = imp.load_source('_route', self.script_uri)
         else:
-            script = __import__(self.script_uri)
+            if ":" in self.script_uri:
+                parts = self.script_uri.rsplit(":", 1)
+                name, objname = parts[0], parts[1]
+                mod = import_module(name)
+                script = getattr(mod, objname)()
+            else:
+                script = import_module(self.script_uri)
         return script
-
+                        
 class Application(object):
 
     LOG_LEVELS = {
