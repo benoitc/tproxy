@@ -91,10 +91,11 @@ class ClientConnection(object):
             if 'reply' in commands:
                 self.send_data(self.sock, commands['reply'])
 
+            extra = commands.get('extra')
             connect_timeout = commands.get('connect_timeout')
             inactivity_timeout = commands.get('inactivity_timeout')
             self.connect_to_resource(remote, connect_timeout=connect_timeout,
-                    inactivity_timeout=inactivity_timeout)
+                    inactivity_timeout=inactivity_timeout, extra=extra)
 
         elif 'close' in commands:
             if isinstance(commands['close'], basestring): 
@@ -122,7 +123,7 @@ class ClientConnection(object):
                 sock.sendall(chunk)
 
     def connect_to_resource(self, addr, connect_timeout=None,
-            inactivity_timeout=None):
+            inactivity_timeout=None, extra=None):
 
         with gevent.Timeout(connect_timeout, ConnectionError):
             try:
@@ -146,7 +147,7 @@ class ClientConnection(object):
             self.buf = []
 
         server = ServerConnection(sock, self, 
-                timeout=inactivity_timeout, buf=self.buf)
+                timeout=inactivity_timeout, extra=extra, buf=self.buf)
         server.handle()
 
 def _closesocket(sock):

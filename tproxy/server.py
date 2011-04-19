@@ -11,7 +11,7 @@ import gevent
 from gevent.event import Event
 from gevent.pool import Group, Pool
 
-from .rewrite import RewriteIO
+from .rewrite import RewriteProxy
 
 class InactivityTimeout(Exception):
     """ Exception raised when the configured timeout elapses without
@@ -27,31 +27,15 @@ class Peers(Group):
             self._killing = True
             gevent.spawn(self.kill)
 
-class RewriteProxy(object):
-
-    def __init__(self, src, dest, rewrite_fun, timeout=None,
-            buf=None):
-        self.src = src
-        self.dest = dest
-        self.rewrite_fun = rewrite_fun
-        self.timeout = timeout
-        self.buf = buf 
-
-    def run(self):
-        pipe = RewriteIO(self.src, self.dest, self.buf) 
-       
-        try:
-            self.rewrite_fun(pipe)
-        finally:
-            pipe.close()
-
 class ServerConnection(object):
 
-    def __init__(self, sock, client, timeout=None, buf=None):
+    def __init__(self, sock, client, timeout=None, extra=None,
+            buf=None):
         self.sock = sock
         self.timeout = timeout
         self.client = client
         self.server = client.server
+        self.extra = extra
         self.buf = buf
 
         self.log = logging.getLogger(__name__)
@@ -75,7 +59,7 @@ class ServerConnection(object):
         """
         if self.server.rewrite_request is not None:
             self.rewrite(src, dest, self.server.rewrite_request,
-                    buf=self.buf)
+                    extra=self.extra, buf=self.buf)
         else:
             while True:
                 data = src.recv(io.DEFAULT_BUFFER_SIZE)
@@ -88,7 +72,8 @@ class ServerConnection(object):
         """ proxy the response from the connected host to the client
         """
         if self.server.rewrite_response is not None:
-            self.rewrite(src, dest, self.server.rewrite_response)
+            self.rewrite(src, dest, self.server.rewrite_response,
+                    extra=self.extra)
         else:
             while True:
                 with gevent.Timeout(self.timeout, InactivityTimeout): 
@@ -98,7 +83,7 @@ class ServerConnection(object):
                 self.log.debug("got data from connected")
                 dest.sendall(data)
 
-    def rewrite(self, src, dest, fun, buf=None):
+    def rewrite(self, src, dest, fun, extra=None, buf=None):
         rwproxy = RewriteProxy(src, dest, fun, timeout=self.timeout, 
-                buf=buf)
+                extra=extra, buf=buf)
         rwproxy.run()

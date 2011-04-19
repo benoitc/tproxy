@@ -7,6 +7,7 @@ import sys
 
 # backports socketio
 import io
+import inspect
 import socket
 
 try:
@@ -137,3 +138,28 @@ class RewriteIO(io.RawIOBase):
 
     def send(self, n=None):
         return self.write(n)
+
+
+class RewriteProxy(object):
+
+    def __init__(self, src, dest, rewrite_fun, timeout=None,
+            extra=None, buf=None):
+        self.src = src
+        self.dest = dest
+        self.rewrite_fun = rewrite_fun
+        self.timeout = timeout
+        self.buf = buf
+        self.extra = extra
+
+    def run(self):
+        pipe = RewriteIO(self.src, self.dest, self.buf) 
+        spec = inspect.getargspec(self.rewrite_fun)
+        try:
+            if len(spec.args) > 1:
+                self.rewrite_fun(pipe, self.extra)
+            else:
+                self.rewrite_fun(pipe)
+        finally:
+            pipe.close()
+
+
