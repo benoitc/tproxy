@@ -21,8 +21,11 @@ CLASSIFIERS = [
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Topic :: Internet',
+        'Topic :: Internet',
+        'Topic :: Internet :: Proxy Servers',
         'Topic :: Utilities',
         'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System :: Networking'
     ]
 
 MODULES = (

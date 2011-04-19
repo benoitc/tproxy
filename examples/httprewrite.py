@@ -40,7 +40,6 @@ def rewrite_request(req):
     except (socket.error, NoMoreData):
         pass
 
-
 def rewrite_response(resp):
     try:
         while True:
