@@ -34,9 +34,6 @@ def rewrite_request(req):
                 if not data:
                     break
                 req.send(data)
-            if not parser.should_keep_alive():
-                print "don't keep alive"
-                break
     except (socket.error, NoMoreData):
         pass
 
