@@ -39,19 +39,8 @@ if sys.version_info < (2, 7, 0, 'final'):
                 if n in _blocking_errnos:
                     return None
                 raise
-
-    def _write(sock, b):
-        try:
-            return sock.send(bytes(b))
-        except socket.error as e:
-            # XXX what about EINTR?
-            if e.args[0] in _blocking_errnos:
-                return None
-            raise
 else:
     _readinto = None
-    _write = None
-
 
 class RewriteIO(io.RawIOBase):
 
@@ -111,11 +100,8 @@ class RewriteIO(io.RawIOBase):
         self._checkClosed()
         self._checkWritable()
 
-        if _write is not None:
-            return _write(self._dest, b)
-
         try:
-            return self._dest.send(b)
+            return self._dest.send(bytes(b))
         except socket.error as e:
             # XXX what about EINTR?
             if e.args[0] in _blocking_errnos:
