@@ -4,6 +4,7 @@
 # See the NOTICE for more information.
 
 import imp
+import inspect
 import logging
 from logging.config import fileConfig
 import os
@@ -29,11 +30,12 @@ class Script(object):
                 parts = self.script_uri.rsplit(":", 1)
                 name, objname = parts[0], parts[1]
                 mod = import_module(name)
-                if self.cfg is not None:
-                    try:
-                        script = getattr(mod, objname)()
-                    except AttributeError:
-                        script = getattr(mod, objname)(self.cfg)
+
+                script_class = getattr(mod, objname)
+                if inspect.getargspec(script_class.__init__) > 1:
+                    script = script_class(self.cfg)
+                else:
+                    script=script_class()
             else:
                 script = import_module(self.script_uri)
 
