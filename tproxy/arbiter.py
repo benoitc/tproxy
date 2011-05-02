@@ -158,7 +158,6 @@ class Arbiter(object):
                 self.halt(reason=inst.reason, exit_status=inst.exit_status)
             except SystemExit:
                 self.halt()
-                raise
             except Exception:
                 self.log.info("Unhandled exception in main loop:\n%s" %  
                             traceback.format_exc())
@@ -258,7 +257,7 @@ class Arbiter(object):
         if self.pidfile is not None:
             self.pidfile.unlink()
         sys.exit(exit_status)
-        
+
     def sleep(self):
         """\
         Sleep until PIPE is readable or we timeout.

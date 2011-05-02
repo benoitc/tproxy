@@ -115,6 +115,13 @@ class Application(object):
 
         if self.cfg.daemon:
             util.daemonize()
+            
+        else:
+            try:
+                os.setpgrp()
+            except OSError, e:
+                if e[0] != errno.EPERM:
+                    raise
         
         self.configure_logging()
         try:
