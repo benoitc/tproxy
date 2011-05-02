@@ -50,17 +50,17 @@ Usage
       --log-config=FILE             The log config file to use. [None]
       -n STRING, --name=STRING      A base to use with setproctitle for process naming.
                                     [None]
-      -D, --daemon                  Daemonize the Gunicorn process. [False]
+      -D, --daemon                  Daemonize the tproxy process. [False]
       -p FILE, --pid=FILE           A filename to use for the PID file. [None]
       -u USER, --user=USER          Switch worker processes to run as this user. [501]
       -g GROUP, --group=GROUP
                                     Switch worker process to run as this group. [20]
       -m INT, --umask=INT           A bit mask for the file mode on files written by
-                                    Gunicorn. [0]
+                                    tproxy. [0]
       -b ADDRESS, --bind=ADDRESS    The socket to bind. [127.0.0.1:8000]
       --backlog=INT                 The maximum number of pending connections.     [2048]
       --ssl-keyfile=STRING          Ssl key file [None]
-      --ssl-certfile=STRING         Ssl ca certs file. contai,s concatenated
+      --ssl-certfile=STRING         Ssl ca certs file. contains concatenated
                                     "certification [None]
       --ssl-ca-certs=STRING         Ssl ca certs file. contains concatenated
                                     "certification [None]
