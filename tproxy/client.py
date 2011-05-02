@@ -4,6 +4,7 @@
 # See the NOTICE for more information.
 
 import logging
+import ssl
 
 import gevent
 from gevent import coros
@@ -90,12 +91,15 @@ class ClientConnection(object):
                 self.buf = [commands['data']]
             if 'reply' in commands:
                 self.send_data(self.sock, commands['reply'])
-
+            
+            is_ssl = commands.get('ssl', False)
+            ssl_args = commands.get('ssl_args', {})
             extra = commands.get('extra')
             connect_timeout = commands.get('connect_timeout')
             inactivity_timeout = commands.get('inactivity_timeout')
-            self.connect_to_resource(remote, connect_timeout=connect_timeout,
-                    inactivity_timeout=inactivity_timeout, extra=extra)
+            self.connect_to_resource(remote, is_ssl=is_ssl, connect_timeout=connect_timeout,
+                    inactivity_timeout=inactivity_timeout, extra=extra,
+                    **ssl_args)
 
         elif 'close' in commands:
             if isinstance(commands['close'], basestring): 
@@ -122,8 +126,8 @@ class ClientConnection(object):
             for chunk in data:
                 sock.sendall(chunk)
 
-    def connect_to_resource(self, addr, connect_timeout=None,
-            inactivity_timeout=None, extra=None):
+    def connect_to_resource(self, addr, is_ssl=False, connect_timeout=None,
+            inactivity_timeout=None, extra=None, **ssl_args):
 
         with gevent.Timeout(connect_timeout, ConnectionError):
             try:
@@ -133,6 +137,9 @@ class ClientConnection(object):
                 else:
                     sock = socket.socket(socket.AF_INET, 
                             socket.SOCK_STREAM)
+
+                if is_ssl:
+                    sock = ssl.wrap_socket(sock, **ssl_args)
                 sock.connect(addr)
             except socket.error, e:
                 raise ConnectionError(

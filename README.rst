@@ -152,6 +152,13 @@ Valid return values
 * { "close": String } - Close the connection after sending
   the String.
 
+To handle ssl for remote connection you can add these optionals
+arguments:
+
+- ssl: True or False, if you want to connect with ssl
+- ssl_args: dict, optionals ssl arguments. Read the `ssl documentation
+  <http://docs.python.org/library/ssl.html?highlight=ssl.wrap_socket#ssl.wrap_socket>`_ for more informations about them. 
+
 Handle errors
 -------------
 
