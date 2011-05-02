@@ -94,6 +94,10 @@ class ProxyServer(StreamServer):
         super(ProxyServer, self).stop_accepting()
 
     def start_accepting(self):
+        self.refresh_name() 
+        super(ProxyServer, self).start_accepting()
+
+    def serve_forever(self):
         if hasattr(self.script, "load"):
             self.route = self.script.load()
         else:
@@ -109,9 +113,7 @@ class ProxyServer(StreamServer):
         except AttributeError:
             pass 
 
-
-        self.refresh_name() 
-        super(ProxyServer, self).start_accepting()
+        super(ProxyServer, self).serve_forever()
 
     def handle(self, socket, address):
         """ handle the connection """

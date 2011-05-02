@@ -70,10 +70,10 @@ class Worker(ProxyServer):
 
         return gevent.spawn(notify)
 
-    def start_accepting(self):
+    def serve_forever(self):
         self.init_process()
         self.start_heartbeat()
-        super(Worker, self).start_accepting()
+        super(Worker, self).serve_forever()
 
     def kill(self):
         """stop accepting."""
