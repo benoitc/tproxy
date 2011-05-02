@@ -55,8 +55,10 @@ class Application(object):
     def __init__(self):
         self.logger = None
         self.cfg = Config("%prog [OPTIONS] script_path")
+        self.script = None
 
-        # parse console args
+    def load_config(self):
+         # parse console args
         parser = self.cfg.parser()
         opts, args = parser.parse_args()
 
@@ -67,14 +69,19 @@ class Application(object):
         self.cfg.default_name = args[0]
 
         # Load conf
-        for k, v in opts.__dict__.items():
-            if v is None:
-                continue
-            self.cfg.set(k.lower(), v)
+        try:
+            for k, v in opts.__dict__.items():
+                if v is None:
+                    continue
+                self.cfg.set(k.lower(), v)
+        except Exception, e:
+            sys.stderr.write("config error: %s\n" % str(e))
+            os._exit(1)
 
         # setup script
         self.script = Script(script_uri, cfg=self.cfg)
         sys.path.insert(0, os.getcwd())
+
 
     def configure_logging(self):
         """\
@@ -104,6 +111,8 @@ class Application(object):
                         self.cfg.logconfig)
 
     def run(self):
+        self.load_config()
+
         if self.cfg.daemon:
             util.daemonize()
         
@@ -113,8 +122,7 @@ class Application(object):
         except RuntimeError, e:
             sys.stderr.write("\nError: %s\n\n" % e)
             sys.stderr.flush()
-            sys.exit(1)
-
+            os._exit(1)
 
 def run():
     return Application().run()
