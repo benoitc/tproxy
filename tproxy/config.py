@@ -453,3 +453,65 @@ class Procname(Setting):
         
         It defaults to 'tproxy'.
         """
+
+class SslKeyFile(Setting):
+    name = "ssl_keyfile"
+    section = "Ssl"
+    cli = ["--ssl-keyfile"]
+    validator = validate_string
+    meta = "STRING"
+    default = None
+    desc = """\
+        Ssl key file
+        """
+
+class SslCertFile(Setting):
+    name = "ssl_certfile"
+    section = "Ssl"
+    cli = ["--ssl-certfile"]
+    validator = validate_string
+    meta = "STRING"
+    default = None
+    desc = """\
+        Ssl cert file
+        """
+
+class SslCertFile(Setting):
+    name = "ssl_certfile"
+    section = "Ssl"
+    cli = ["--ssl-certfile"]
+    validator = validate_string
+    meta = "STRING"
+    default = None
+    desc = """\
+        Ssl ca certs file. contai,s concatenated “certification
+        authority” certificates.
+        """
+
+class SslCACerts(Setting):
+    name = "ssl_ca_certs"
+    section = "Ssl"
+    cli = ["--ssl-ca-certs"]
+    validator = validate_string
+    meta = "STRING"
+    default = None
+    desc = """\
+        Ssl ca certs file. contains concatenated "certification
+        authority" certificates.
+        """
+
+class SSLCertReq(Setting):
+    name = "ssl_cert_reqs"
+    section = "Ssl"
+    cli = ["--ssl-cert-reqs"]
+    validator = validate_pos_int
+    meta = "INT"
+    default = 0
+    desc = """\
+        Specifies whether a certificate is required from the other
+        side of the connection, and whether it will be validated if
+        provided. Values are: 0 (certificates ignored), 1 (not
+        required, but validated if provided), 2 (required and
+        validated).
+        """
+

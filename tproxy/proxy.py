@@ -68,7 +68,7 @@ class ProxyServer(StreamServer):
 
          # make SSL work:
         if self.ssl_enabled:
-            self._handle = self.wrapsocket_and_handle
+            self._handle = self.wrap_socket_and_handle
         else:
             self._handle = self.handle
 
@@ -119,6 +119,11 @@ class ProxyServer(StreamServer):
         """ handle the connection """
         conn = ClientConnection(socket, address, self)
         conn.handle()
+
+    def wrap_socket_and_handle(self, client_socket, address):
+        # used in case of ssl sockets
+        ssl_socket = self.wrap_socket(client_socket, **self.ssl_args)
+        return self.handle(ssl_socket, address)
 
 def tcp_listener(address, backlog=None):
     backlog = backlog or 128

@@ -9,6 +9,8 @@ import signal
 
 import gevent
 from gevent.pool import Pool
+from gevent.ssl import wrap_socket
+
 
 from . import util
 from .proxy import ProxyServer
@@ -24,6 +26,19 @@ class Worker(ProxyServer):
     def __init__(self, age, ppid, listener, cfg, script):
         ProxyServer.__init__(self, listener, script, 
                 spawn=Pool(cfg.worker_connections))
+
+        if cfg.ssl_keyfile and cfg.ssl_certfile:
+            self.wrap_socket = wrap_socket
+            self.ssl_args = dict(
+                    keyfile = cfg.ssl_keyfile,
+                    certfile = cfg.ssl_certfile,
+                    server_side = True,
+                    cert_reqs = cfg.ssl_cert_reqs,
+                    ca_certs = cfg.ssl_ca_certs,
+                    suppress_ragged_eofs=True,
+                    do_handshake_on_connect=True)
+            self.ssl_enabled = True
+
         self.age = age
         self.ppid = ppid
         self.cfg = cfg
