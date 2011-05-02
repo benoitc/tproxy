@@ -13,11 +13,6 @@ import greenlet
 from .server import ServerConnection, InactivityTimeout
 from .util import parse_address, is_ipv6
 
-try:
-    from .zmq_server import ZmqServer
-except ImportError, e:
-    ZmqServer = None
-
 log = logging.getLogger(__name__)
 
 class ConnectionError(Exception):
@@ -99,7 +94,6 @@ class ClientConnection(object):
             extra = commands.get('extra')
             connect_timeout = commands.get('connect_timeout')
             inactivity_timeout = commands.get('inactivity_timeout')
-
             self.connect_to_resource(remote, connect_timeout=connect_timeout,
                     inactivity_timeout=inactivity_timeout, extra=extra)
 
@@ -107,24 +101,6 @@ class ClientConnection(object):
             if isinstance(commands['close'], basestring): 
                 self.send_data(self.sock, commands['close'])
             raise StopIteration()
-        elif 'sender_uri' in commands and 'receiver_uri' in commands:
-            if ZmqServer is None:
-                raise RuntimeError("gevent_zeromq is required.")
-
-            sender_uri = commands.get('sender_uri')
-            receiver_uri = commands.get('receiver_uri')
-
-            if 'data' in commands:
-                self.buf = [commands['data']]
-            if 'reply' in commands:
-                self.send_data(self.sock, commands['reply'])
-
-            extra = commands.get('extra')
-            
-            server = ZmqServer(sender_uri, receiver_uri, self,
-                    extra=extra, buf=self.buf)
-            server.handle()
-
         else:
             raise StopIteration()
 
