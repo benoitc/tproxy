@@ -59,6 +59,13 @@ Usage
                                     Gunicorn. [0]
       -b ADDRESS, --bind=ADDRESS    The socket to bind. [127.0.0.1:8000]
       --backlog=INT                 The maximum number of pending connections.     [2048]
+      --ssl-keyfile=STRING          Ssl key file [None]
+      --ssl-certfile=STRING         Ssl ca certs file. contai,s concatenated
+                                    "certification [None]
+      --ssl-ca-certs=STRING         Ssl ca certs file. contains concatenated
+                                    "certification [None]
+      --ssl-cert-reqs=INT           Specifies whether a certificate is required from the
+                                    other [0]
       -w INT, --workers=INT         The number of worker process for handling requests. [1]
       --worker-connections=INT      The maximum number of simultaneous clients per worker.
                                     [1000]

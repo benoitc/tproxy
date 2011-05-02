@@ -484,8 +484,8 @@ class SslCertFile(Setting):
     meta = "STRING"
     default = None
     desc = """\
-        Ssl ca certs file. contai,s concatenated “certification
-        authority” certificates.
+        Ssl ca certs file. contai,s concatenated "certification
+        authority" certificates.
         """
 
 class SslCACerts(Setting):
