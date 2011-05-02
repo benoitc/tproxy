@@ -381,7 +381,7 @@ class Umask(Setting):
     type = "int"
     default = 0
     desc = """\
-        A bit mask for the file mode on files written by Gunicorn.
+        A bit mask for the file mode on files written by tproxy.
         
         Note that this affects unix socket permissions.
         
@@ -484,7 +484,7 @@ class SslCertFile(Setting):
     meta = "STRING"
     default = None
     desc = """\
-        Ssl ca certs file. contai,s concatenated "certification
+        Ssl ca certs file. contains concatenated "certification
         authority" certificates.
         """
 
