@@ -17,8 +17,9 @@ from .tools import import_module
 class Script(object):
     """ load a python file or module """
 
-    def __init__(self, script_uri):
+    def __init__(self, script_uri, cfg=None):
         self.script_uri = script_uri
+        self.cfg = cfg
 
     def load(self):
         if os.path.exists(self.script_uri):
@@ -28,9 +29,15 @@ class Script(object):
                 parts = self.script_uri.rsplit(":", 1)
                 name, objname = parts[0], parts[1]
                 mod = import_module(name)
-                script = getattr(mod, objname)()
+                if self.cfg is not None:
+                    try:
+                        script = getattr(mod, objname)()
+                    except AttributeError:
+                        script = getattr(mod, objname)(self.cfg)
             else:
                 script = import_module(self.script_uri)
+
+        script.__dict__['__tproxy_cfg__'] = self.cfg
         return script
                         
 class Application(object):
@@ -56,15 +63,16 @@ class Application(object):
 
         script_uri = args[0]
         self.cfg.default_name = args[0]
-        self.script = Script(script_uri)
-
-        sys.path.insert(0, os.getcwd())
 
         # Load conf
         for k, v in opts.__dict__.items():
             if v is None:
                 continue
             self.cfg.set(k.lower(), v)
+
+        # setup script
+        self.script = Script(script_uri, cfg=self.cfg)
+        sys.path.insert(0, os.getcwd())
 
     def configure_logging(self):
         """\
