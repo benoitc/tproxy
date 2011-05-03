@@ -181,17 +181,20 @@ Valid return values
 * { "file": Int, "reply": String} - Same as above but reply with given
   data back to the client 
 * { "file": Int } - Return a file specify by
-  its file descriptor * { "file": Int, "reply": String} - Same as above
+  its file descriptor 
+* { "file": Int, "reply": String} - Same as above
   but reply with given data back to the client
 
+Notes:
+++++++
 
-**"file"** command can have 2 optionnnal parameters:
+If `sendfile <http://en.wikipedia.org/wiki/Sendfile>`_ API available it
+will be used to send a file with "file" command. 
+
+The **file** command can have 2 optionnnal parameters:
 
 - offset: argument specifies where to begin in the file.
 - nbytes: specifies how many bytes of the file should be sent
-
-If `sendfile <http://en.wikipedia.org/wiki/Sendfile>`_ API available it
-will be used to send a file with "file" command.
 
 
 To handle ssl for remote connection you can add these optionals
