@@ -16,7 +16,12 @@ gunicorn/config.py
 gunicorn/pidfile.py
 gunicorn/workertmp.py
 
-
 backports from python 2.7/3.x
 -----------------------------
 tools.import_module
+
+
+gunicorn/_sendfile.py 
+---------------------
+
+based on gunicorn/sendfile.py refactored

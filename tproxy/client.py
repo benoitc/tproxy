@@ -4,6 +4,7 @@
 # See the NOTICE for more information.
 
 import logging
+import os
 import ssl
 
 import gevent
@@ -13,6 +14,7 @@ import greenlet
 
 from .server import ServerConnection, InactivityTimeout
 from .util import parse_address, is_ipv6
+from .sendfile import async_sendfile
 
 log = logging.getLogger(__name__)
 
@@ -104,6 +106,24 @@ class ClientConnection(object):
         elif 'close' in commands:
             if isinstance(commands['close'], basestring): 
                 self.send_data(self.sock, commands['close'])
+            raise StopIteration()
+
+        elif 'file' in commands:
+            # command to send a file
+            if isinstance(commands['file'], basestring):
+                fdin = os.open(commands['file'], os.O_RDONLY)
+            else:
+                fdin = commands['file']
+
+            offset = commands.get('offset', 0)
+            nbytes = commands.get('nbytes', os.fstat(fdin).st_size)
+        
+            # send a reply if needed, useful in HTTP response.
+            if 'reply' in commands:
+                self.send_data(self.sock, commands['reply'])
+            
+            # use sendfile if possible to send the file content
+            async_sendfile(self.sock.fileno(), fdin, offset, nbytes)
             raise StopIteration()
         else:
             raise StopIteration()

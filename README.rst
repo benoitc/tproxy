@@ -145,6 +145,22 @@ Example SOCKS4 Proxy in 18 Lines
         else:
             return {"close": "\0\x5b\0\0\0\0\0\0"}
 
+Example of returning a file
+---------------------------
+
+::
+
+    import os
+
+    WELCOME_FILE = os.path.join(os.path.dirname(__file__), "welcome.txt")
+
+    def proxy(data):
+        fno = os.open(WELCOME_FILE, os.O_RDONLY) 
+        return {
+                "file": fno,
+                "reply": "HTTP/1.1 200 OK\r\n\r\n"
+               }
+
 Valid return values
 -------------------
 
@@ -158,6 +174,25 @@ Valid return values
 * { "close": True } - Close the connection.
 * { "close": String } - Close the connection after sending
   the String.
+* { "file": String } - Return a file specify by the file path and close
+  the connection.
+* { "file": String, "reply": String } - Return a file specify by the
+  file path and close the connection.
+* { "file": Int, "reply": String} - Same as above but reply with given
+  data back to the client 
+* { "file": Int } - Return a file specify by
+  its file descriptor * { "file": Int, "reply": String} - Same as above
+  but reply with given data back to the client
+
+
+**"file"** command can have 2 optionnnal parameters:
+
+- offset: argument specifies where to begin in the file.
+- nbytes: specifies how many bytes of the file should be sent
+
+If `sendfile <http://en.wikipedia.org/wiki/Sendfile>`_ API available it
+will be used to send a file with "file" command.
+
 
 To handle ssl for remote connection you can add these optionals
 arguments:
