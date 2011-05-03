@@ -197,7 +197,7 @@ The **file** command can have 2 optionnnal parameters:
 - nbytes: specifies how many bytes of the file should be sent
 
 
-To handle ssl for remote connection you can add these optionals
+To **handle ssl for remote connection** you can add these optionals
 arguments:
 
 - ssl: True or False, if you want to connect with ssl
