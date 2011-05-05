@@ -148,7 +148,7 @@ def tcp_listener(address, backlog=None):
         sock = socket.socket(family, socket.SOCK_STREAM)
 
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+    
     for i in range(5):
         try:
             if not bound:

@@ -20,6 +20,7 @@ import random
 import resource
 import socket
 
+from gevent.hub import fork
 try:
     from setproctitle import setproctitle
     def _setproctitle(title):
@@ -106,28 +107,40 @@ def set_non_blocking(fd):
     flags = fcntl.fcntl(fd, fcntl.F_GETFL) | os.O_NONBLOCK
     fcntl.fcntl(fd, fcntl.F_SETFL, flags)
 
-def daemonize():
+def daemonize(close=False):
     """\
     Standard daemonization of a process.
     http://www.svbug.com/documentation/comp.unix.programmer-FAQ/faq_2.html#SEC16
     """
     if not 'TPROXY_FD' in os.environ:
-        if os.fork():
-            os._exit(0)
+        try:
+            if fork():
+                os._exit(0)
+        except OSError, e:
+            sys.stderr.write("fork #1 failed: %s\n" % str(e))
+            sys.exit(1)
+
         os.setsid()
-
-        if os.fork():
-            os._exit(0)
         
-        os.umask(0)
-        maxfd = get_maxfd()
+        try:
+            if fork():
+                os._exit(0)
+        except OSError, e:
+            sys.stderr.write("fork #2 failed: %s\n" % str(e))
+            sys.exit(1)
 
-        # Iterate through and close all file descriptors.
-        for fd in range(0, maxfd):
-            try:
-                os.close(fd)
-            except OSError:	# ERROR, fd wasn't open to begin with (ignored)
-                pass
+        os.umask(0)
+        
+        if close:
+            maxfd = get_maxfd()
+
+            # Iterate through and close all file descriptors.
+            for fd in range(0, maxfd):
+                try:
+                    os.close(fd)
+                except OSError:	
+                    # ERROR, fd wasn't open to begin with (ignored)
+                    pass
         
         os.open(REDIRECT_TO, os.O_RDWR)
         os.dup2(0, 1)

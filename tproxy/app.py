@@ -10,6 +10,12 @@ from logging.config import fileConfig
 import os
 import sys
 
+from gevent import core
+from gevent.hub import get_hub
+from gevent import monkey
+monkey.noisy = False
+monkey.patch_all()
+
 from . import util
 from .arbiter import Arbiter
 from .config import Config
@@ -115,14 +121,13 @@ class Application(object):
 
         if self.cfg.daemon:
             util.daemonize()
-            
         else:
             try:
                 os.setpgrp()
             except OSError, e:
                 if e[0] != errno.EPERM:
                     raise
-        
+      
         self.configure_logging()
         try:
             Arbiter(self.cfg, self.script).run()
@@ -132,4 +137,4 @@ class Application(object):
             os._exit(1)
 
 def run():
-    return Application().run()
+    Application().run()

@@ -23,6 +23,8 @@ class Worker(ProxyServer):
         "HUP QUIT INT TERM USR1 USR2 WINCH CHLD".split()
     )
 
+    PIPE = []
+
     def __init__(self, age, ppid, listener, cfg, script):
         ProxyServer.__init__(self, listener, script, 
                 spawn=Pool(cfg.worker_connections))
@@ -63,6 +65,12 @@ class Worker(ProxyServer):
 
         # Reseed the random number generator
         util.seed()
+
+        # For waking ourselves up
+        self.PIPE = os.pipe()
+        map(util.set_non_blocking, self.PIPE)
+        map(util.close_on_exec, self.PIPE)
+        
 
         # Prevent fd inherientence
         util.close_on_exec(self.socket)

@@ -12,10 +12,6 @@ import time
 import traceback
 
 import gevent
-from gevent import monkey
-monkey.noisy = False
-monkey.patch_all()
-
 from gevent import select
 
 from . import __version__
@@ -111,7 +107,7 @@ class Arbiter(object):
         are queued. Child signals only wake up the master.
         """
         if self.PIPE:
-            map(lambda p: os.close(p), self.PIPE)
+            map(os.close, self.PIPE)
         self.PIPE = pair = os.pipe()
         map(util.set_non_blocking, pair)
         map(util.close_on_exec, pair)
@@ -157,7 +153,7 @@ class Arbiter(object):
             except HaltServer, inst:
                 self.halt(reason=inst.reason, exit_status=inst.exit_status)
             except SystemExit:
-                self.halt()
+                raise 
             except Exception:
                 self.log.info("Unhandled exception in main loop:\n%s" %  
                             traceback.format_exc())
