@@ -23,13 +23,12 @@ _blocking_errnos = ( EAGAIN, EWOULDBLOCK, EBADF)
 
 if sys.version_info < (2, 7, 0, 'final'):
     # in python 2.6 socket.recv_into doesn't support bytesarray
-    import array
     def _readinto(sock, b):
-        buf = array.array('c', ' ' * len(b))
         while True:
             try:
-                recved = sock.recv_into(buf)
-                b[0:recved] = buf.tostring()
+                data = sock.recv(len(b))
+                recved = len(data)
+                b[0:recved] = data
                 return recved
             except socket.error as e:
                 n = e.args[0]
