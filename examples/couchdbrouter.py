@@ -5,7 +5,7 @@ class CouchDBRouter(object):
     # look at the routing table and return a couchdb node to use
     def lookup(self, name):
         """ do something """
-        return ("127.0.0.1",15984)
+        return ("127.0.0.1",5984)
 router = CouchDBRouter()
 
 # Perform content-aware routing based on the stream data. Here, the
