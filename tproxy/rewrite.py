@@ -21,7 +21,7 @@ EWOULDBLOCK = getattr(errno, 'EWOULDBLOCK', 11)
 
 _blocking_errnos = ( EAGAIN, EWOULDBLOCK, EBADF)
 
-if sys.version_info < (2, 7, 0, 'final'):
+if sys.version_info[:2] < (2, 7):
     # in python 2.6 socket.recv_into doesn't support bytesarray
     def _readinto(sock, b):
         while True:
@@ -38,9 +38,11 @@ if sys.version_info < (2, 7, 0, 'final'):
                 if n in _blocking_errnos:
                     return None
                 raise
+    _get_memory = buffer
 else:
     _readinto = None
-
+    def _get_memory(string, offset):
+        return memoryview(string)[offset:]
 
 class RewriteIO(io.RawIOBase):
 
@@ -108,6 +110,11 @@ class RewriteIO(io.RawIOBase):
                 return None
             raise
 
+    def writeall(self, b):
+        sent = 0
+        while sent < len(b):
+            sent += self._dest.send(_get_memory(b, sent))
+
     def readable(self):
         """True if the SocketIO is open for reading.
         """
@@ -117,14 +124,16 @@ class RewriteIO(io.RawIOBase):
         """True if the SocketIO is open for writing.
         """
         return not self.closed
-
     
     def recv(self, n=None):
         return self.read(n)
 
-    def send(self, n=None):
-        return self.write(n)
+    def send(self, b):
+        return self.write(b)
 
+    def sendall(self, b):
+        return self.writeall(b)
+        
 
 class RewriteProxy(object):
 

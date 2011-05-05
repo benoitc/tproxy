@@ -33,7 +33,7 @@ def rewrite_request(req):
                 data = body.read(8192)
                 if not data:
                     break
-                req.send(data)
+                req.writeall(data)
     except (socket.error, NoMoreData):
         pass
 
@@ -43,7 +43,7 @@ def rewrite_response(resp):
             parser = HttpStream(resp)
             # we aren't doing anything here
             for data in parser:
-                resp.send(data)
+                resp.writeall(data)
      
             if not parser.should_keep_alive():
                 # close the connection.

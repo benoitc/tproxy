@@ -6,14 +6,14 @@ def rewrite_request(req):
         data = req.read(io.DEFAULT_BUFFER_SIZE)
         if not data:
             break
-        req.write(data) 
+        req.writeall(data) 
 
 def rewrite_response(resp):
     while True:
         data = resp.read(io.DEFAULT_BUFFER_SIZE)
         if not data:
             break
-        resp.write(data)
+        resp.writeall(data)
 
 def proxy(data):
     return {'remote': ('google.com', 80)}
