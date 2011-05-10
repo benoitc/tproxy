@@ -21,6 +21,7 @@ monkey.patch_all()
 
 
 from .client import ClientConnection
+from .route import Route
 from . import util
 
 log = logging.getLogger(__name__)
@@ -82,20 +83,7 @@ class ProxyServer(StreamServer):
         if self.route is not None:
             return
 
-        if hasattr(self.script, "load"):
-            self.route = self.script.load()
-        else:
-            self.route = self.script
-       
-        try: 
-            self.rewrite_request = self.route.rewrite_request
-        except AttributeError:
-            pass 
-       
-        try:
-            self.rewrite_response =  self.route.rewrite_response
-        except AttributeError:
-            pass
+        self.route = Route(self.script) 
 
     def start_accepting(self):
         self.init_route()
