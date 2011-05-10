@@ -17,8 +17,10 @@ class Route(object):
         else:
             self.script = script
 
+        self.empty_buf = True
         if hasattr(self.script, 'rewrite_request'):
             self.proxy_input = self.rewrite_request
+            self.empty_buf = False
         else:
             self.proxy_input = self.proxy_io
 
@@ -32,7 +34,7 @@ class Route(object):
     def proxy(self, data):
         return self.script.proxy(data)
 
-    def proxy_io(self, src, dest, *kwargs):
+    def proxy_io(self, src, dest, buf=None, **kwargs):
         while True:
             data = src.recv(io.DEFAULT_BUFFER_SIZE)
             if not data: 

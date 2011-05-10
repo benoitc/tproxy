@@ -34,6 +34,7 @@ class ServerConnection(object):
         self.client = client
         self.extra = extra
         self.buf = buf
+
         self.route = client.route
 
         self.log = logging.getLogger(__name__)
@@ -44,20 +45,21 @@ class ServerConnection(object):
         """
         try:
             peers = Peers([
-                gevent.spawn(self.route.proxy_input, self.client.sock, self.sock),
+                gevent.spawn(self.route.proxy_input, self.client.sock,
+                    self.sock, self.buf, self.extra),
                 gevent.spawn(self.route.proxy_connected, self.sock, 
-                    self.client.sock)])
+                    self.client.sock, self.extra)])
             gevent.joinall(peers.greenlets)
         finally:
             self.sock.close()
 
         
-    def proxy_input(self, src, dest):
+    def proxy_input(self, src, dest, buf, extra):
         """ proxy innput to the connected host
         """
-        self.route.proxy_input(src, dest, buf=self.buf, extra=self.extra) 
+        self.route.proxy_input(src, dest, buf=buf, extra=extra) 
 
-    def proxy_connected(self, src, dest):
+    def proxy_connected(self, src, dest, extra):
         """ proxy the response from the connected host to the client
         """
-        self.route.proxy_input(src, dest, extra=self.extra) 
+        self.route.proxy_connected(src, dest, extra=extra) 

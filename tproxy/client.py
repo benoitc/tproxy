@@ -84,6 +84,7 @@ class ClientConnection(object):
         if commands is None: # do nothing
             return 
 
+        
         if not isinstance(commands, dict):
             raise StopIteration
         
@@ -169,7 +170,7 @@ class ClientConnection(object):
         self.connected = True
         log.debug("Successful connection to %s:%s" % addr)
 
-        if self.buf and not self.worker.rewrite_request:
+        if self.buf and self.route.empty_buf:
             self.send_data(sock, self.buf)
             self.buf = []
 
