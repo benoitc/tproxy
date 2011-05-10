@@ -17,12 +17,12 @@ class Route(object):
         else:
             self.script = script
 
-        if hasattr(script, 'rewrite_request'):
+        if hasattr(self.script, 'rewrite_request'):
             self.proxy_input = self.rewrite_request
         else:
             self.proxy_input = self.proxy_io
 
-        if hasattr(script, 'rewrite_response'):
+        if hasattr(self.script, 'rewrite_response'):
             self.proxy_connected = self.rewrite_response
         else:
             self.proxy_connected = self.proxy_io
@@ -51,11 +51,3 @@ class Route(object):
     def rewrite_response(self, src, dest, extra=None):
         self.rewrite(src, dest, self.script.rewrite_response, 
                 extra=extra)
-        
-
-
-
-
-        
-
-        
