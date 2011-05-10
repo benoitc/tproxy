@@ -34,9 +34,22 @@ class ServerConnection(object):
         self.sock = sock
         self.timeout = timeout
         self.client = client
-        self.server = client.server
         self.extra = extra
         self.buf = buf
+
+
+        if hasattr(self.client.worker, 'rewrite_request'):
+            self.rewrite_request = getattr(self.client.worker, 
+                'rewrite_request')
+        else:
+            self.rewrite_request = None
+
+        if hasattr(self.client.worker, 'rewrite_response'):
+            self.rewrite_response = getattr(self.client.worker, 
+                'rewrite_response')
+        else:
+            self.rewrite_response = None
+
 
         self.log = logging.getLogger(__name__)
         self._stopped_event = Event()
@@ -51,14 +64,14 @@ class ServerConnection(object):
                     self.client.sock)])
             gevent.joinall(peers.greenlets)
         finally:
-            self.sock.close
+            self.sock.close()
 
         
     def proxy_input(self, src, dest):
         """ proxy innput to the connected host
         """
-        if self.server.rewrite_request is not None:
-            self.rewrite(src, dest, self.server.rewrite_request,
+        if self.rewrite_request is not None:
+            self.rewrite(src, dest, self.rewrite_request,
                     extra=self.extra, buf=self.buf)
         else:
             while True:
@@ -71,8 +84,8 @@ class ServerConnection(object):
     def proxy_connected(self, src, dest):
         """ proxy the response from the connected host to the client
         """
-        if self.server.rewrite_response is not None:
-            self.rewrite(src, dest, self.server.rewrite_response,
+        if self.rewrite_response is not None:
+            self.rewrite(src, dest, self.rewrite_response,
                     extra=self.extra)
         else:
             while True:

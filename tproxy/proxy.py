@@ -28,11 +28,11 @@ log = logging.getLogger(__name__)
 
 class ProxyServer(StreamServer):
 
-    def __init__(self, listener, script, name=None, backlog=None, 
+    def __init__(self, listener, script, backlog=None, 
             spawn='default', **sslargs):
         StreamServer.__init__(self, listener, backlog=backlog,
                 spawn=spawn, **sslargs)
-        self.name = name
+        
         self.script = script
         self.nb_connections = 0
         self.route = None
@@ -78,26 +78,10 @@ class ProxyServer(StreamServer):
         signal.signal(signal.SIGINT, self.handle_exit)
         signal.signal(signal.SIGWINCH, self.handle_winch)
 
-    def refresh_name(self):
-        title = "worker"
-        if self.name is not None:
-            title += " [%s]"
-        title = "%s - handling %s connections" % (title, self.nb_connections)
-        util._setproctitle(title)
+    def init_route(self):
+        if self.route is not None:
+            return
 
-    def stop_accepting(self):
-        title = "worker"
-        if self.name is not None:
-            title += " [%s]"
-        title = "%s - stop accepting" % title
-        util._setproctitle(title)
-        super(ProxyServer, self).stop_accepting()
-
-    def start_accepting(self):
-        self.refresh_name() 
-        super(ProxyServer, self).start_accepting()
-
-    def serve_forever(self):
         if hasattr(self.script, "load"):
             self.route = self.script.load()
         else:
@@ -111,9 +95,11 @@ class ProxyServer(StreamServer):
         try:
             self.rewrite_response =  self.route.rewrite_response
         except AttributeError:
-            pass 
+            pass
 
-        super(ProxyServer, self).serve_forever()
+    def start_accepting(self):
+        self.init_route()
+        super(ProxyServer, self).start_accepting()
 
     def handle(self, socket, address):
         """ handle the connection """

@@ -1,2 +1,2 @@
 def proxy(data):
-    return { "remote": "google.com:80" }
+    return { "remote": "127.0.0.1:8000" }

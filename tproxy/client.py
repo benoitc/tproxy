@@ -24,12 +24,12 @@ class ConnectionError(Exception):
 
 class ClientConnection(object):
 
-    def __init__(self, sock, addr, server):
+    def __init__(self, sock, addr, worker):
         self.sock = sock
         self.addr = addr
-        self.server = server
+        self.worker = worker
 
-        self.route = server.route
+        self.route = self.worker.route
         self.buf = []
         self.remote = None
         self.connected = False
@@ -37,8 +37,8 @@ class ClientConnection(object):
 
     def handle(self):
         with self._lock:
-            self.server.nb_connections +=1
-            self.server.refresh_name()
+            self.worker.nb_connections +=1
+            self.worker.refresh_name()
 
         try:
             while not self.connected:
@@ -71,8 +71,8 @@ class ClientConnection(object):
                 log.debug("Close connection to %s:%s" % self.remote)
 
             with self._lock:
-                self.server.nb_connections -=1
-                self.server.refresh_name()
+                self.worker.nb_connections -=1
+                self.worker.refresh_name()
             _closesocket(self.sock)
 
     def handle_error(self, e):
@@ -169,7 +169,7 @@ class ClientConnection(object):
         self.connected = True
         log.debug("Successful connection to %s:%s" % addr)
 
-        if self.buf and not self.server.rewrite_request:
+        if self.buf and not self.worker.rewrite_request:
             self.send_data(sock, self.buf)
             self.buf = []
 

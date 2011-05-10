@@ -41,6 +41,7 @@ class Worker(ProxyServer):
                     do_handshake_on_connect=True)
             self.ssl_enabled = True
 
+        self.name = cfg.name
         self.age = age
         self.ppid = ppid
         self.cfg = cfg
@@ -97,6 +98,25 @@ class Worker(ProxyServer):
         self.init_process()
         self.start_heartbeat()
         super(Worker, self).serve_forever()
+
+    def refresh_name(self):
+        title = "worker"
+        if self.name is not None:
+            title += " [%s]"
+        title = "%s - handling %s connections" % (title, self.nb_connections)
+        util._setproctitle(title)
+
+    def stop_accepting(self):
+        title = "worker"
+        if self.name is not None:
+            title += " [%s]"
+        title = "%s - stop accepting" % title
+        util._setproctitle(title)
+        super(Worker, self).stop_accepting()
+
+    def start_accepting(self):
+        self.refresh_name() 
+        super(Worker, self).start_accepting()
 
     def kill(self):
         """stop accepting."""
