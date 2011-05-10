@@ -62,7 +62,6 @@ class RewriteIO(io.RawIOBase):
         if not buf:
             buf = []
         self._buf = buf
-        print buf
         
     def readinto(self, b):
         self._checkClosed()
