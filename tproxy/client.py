@@ -42,7 +42,7 @@ class ClientConnection(object):
 
         try:
             while not self.connected:
-                data = self.sock.recv(8192)
+                data = self.sock.recv(1024)
                 if not data:
                     break
                 self.buf.append(data)
