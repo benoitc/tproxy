@@ -34,7 +34,7 @@ class Route(object):
     def proxy(self, data):
         return self.script.proxy(data)
 
-    def proxy_io(self, src, dest, buf=None, **kwargs):
+    def proxy_io(self, src, dest, buf=None, extra=None):
         while True:
             data = src.recv(io.DEFAULT_BUFFER_SIZE)
             if not data: 
