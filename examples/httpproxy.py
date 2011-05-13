@@ -4,7 +4,12 @@
 # See the NOTICE for more information.
 
 
-""" simple proxy that can be used behind a browser. """
+""" simple proxy that can be used behind a browser. 
+This example require http_parser module:
+
+    pip install http_parser
+
+"""
 
 import io
 import urlparse
@@ -85,6 +90,22 @@ def rewrite_request(req):
     
 def proxy(data):
     recved = len(data)
+
+    idx = data.find("\r\n")
+    if idx <= 0:
+        return
+
+    line, rest = data[:idx], data[idx:]
+    if line.startswith("CONNECT"):
+        parts = line.split(None)
+        netloc = parts[1]
+        remote = parse_address(netloc, 80)
+
+        reply_msg = "%s 200 OK\r\n\r\n" % parts[2]
+        return {"remote": remote, 
+                "reply": reply_msg,
+                "data": ""}
+
 
     parser = HttpParser()
     parsed = parser.execute(data, recved)
