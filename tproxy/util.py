@@ -20,7 +20,13 @@ import random
 import resource
 import socket
 
-from gevent.hub import fork
+# add support for gevent 1.0
+from gevent import version_info
+if version_info[0] >0:
+    from gevent.os import fork
+else:
+    from gevent.hub import fork
+    
 try:
     from setproctitle import setproctitle
     def _setproctitle(title):
